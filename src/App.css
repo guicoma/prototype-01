@@ -1,0 +1,58 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+.demo-list{
+  overflow: auto;
+  height: 300px;
+}
+
+.share-modal-2 .ant-modal-body {
+  padding: 0;
+}
+
+.share-description {
+  padding-left: 23px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.share-description ul {
+  color: darkgrey;
+  font-size: 12px;
+  line-height: 14px;
+  font-style: italic;
+  padding-left: 20px;
+}
+
+.members-panel .ant-collapse-content-box {
+  padding-right: 0;
+  padding-bottom: 0;
+}
+.members-panel .ant-collapse-item-active .ant-collapse-item:last-child {
+  border-bottom: none;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
