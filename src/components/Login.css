@@ -1,5 +1,6 @@
 #proto-login .login-form {
     max-width: 300px;
+    margin: 24px auto;
 }
 #proto-login .login-form-forgot {
     float: right;

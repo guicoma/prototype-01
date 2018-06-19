@@ -1,19 +1,20 @@
 import React, { Component } from 'react';
-import { Modal, Button, Select, Input, Collapse, Checkbox, DatePicker, Form, Icon, Layout, List, Avatar, Row} from 'antd';
+import { Modal, Button, Select, Input, Collapse, Checkbox, DatePicker, Form, Icon, Layout, List, Avatar, Steps} from 'antd';
 import reqwest from 'reqwest';
 
-const { TextArea } = Input;
-const Option = Select.Option;
-const Panel = Collapse.Panel;
+const { TextArea }        = Input;
+const Option              = Select.Option;
+const Panel               = Collapse.Panel;
+const FormItem            = Form.Item;
+const { Content, Sider }  = Layout;
+const Step                = Steps.Step;
+
 const children = [];
 const text = `
   A dog is a type of domesticated animal.
   Known for its loyalty and faithfulness,
   it can be found as a welcome guest in many households across the world.
 `;
-const FormItem = Form.Item;
-
-const { Content, Sider } = Layout;
 
 const fakeDataUrl = 'https://randomuser.me/api/?results=12&inc=name,gender,email,nat&noinfo';
 
@@ -33,12 +34,27 @@ function callback(key) {
 
 
 class Transfer extends Component {
-  state = {
-    loading: false,
-    visible: false,
-    visible2: false,
-    data: [],
-    titleEnabled: false
+  constructor(props) {
+    super(props);
+    this.state = {
+      current: 0,
+      transferName : 'default_file_or_folder_name.pdf',
+      loading: false,
+      visible: false,
+      visible2: false,
+      data: [],
+      option: {},
+      titleEnabled: false
+    };
+  }
+
+  next() {
+    const current = this.state.current + 1;
+    this.setState({ current });
+  }
+  prev() {
+    const current = this.state.current - 1;
+    this.setState({ current });
   }
 
   toggleMembers = () => {
@@ -77,19 +93,28 @@ class Transfer extends Component {
       visible2: true,
     });
   }
+
   handleOk = (e) => {
     console.log(e);
-    this.setState({ loading: true });
-    setTimeout(() => {
-      this.setState({ loading: false, visible: false, visible2: false });
-    }, 3000);
+    if (this.state.current < 1) {
+      this.next();
+    }else{
+      this.setState({ loading: true });
+      setTimeout(() => {
+        this.setState({ loading: false, visible: false, visible2: false });
+      }, 3000);
+    }
   }
   handleCancel = (e) => {
     console.log(e);
-    this.setState({
-      visible: false,
-      visible2: false,
-    });
+    if (this.state.current > 0) {
+      this.prev();
+    }else{
+      this.setState({
+        visible: false,
+        visible2: false,
+      });
+    }
   }
 
   handleSubmit = (e) => {
@@ -107,6 +132,12 @@ class Transfer extends Component {
     });
   }
 
+  onEditTitle = (e) => {
+    this.setState({
+      transferName: e.target.value
+    });
+  }
+
   saveTitle = (e) => {
     console.log('Save title');
     this.setState({
@@ -116,25 +147,14 @@ class Transfer extends Component {
 
   onChange = (e) => {
     console.log('target.value', e.target.value);
-    switch(e.target.value) {
-      case ("password"):
-        this.setState({
-          option_password: e.target.checked,
-        });
-      break;
-      case ("url"):
-        this.setState({
-          option_url: e.target.checked,
-        });
-      break;
-      case ("expiration"):
-        this.setState({
-          option_expiration: e.target.checked,
-        });
-      break;
-      default:
-      break;
-    }
+    let optionObj  = this.state.option;
+    optionObj[e.target.value] = e.target.checked;
+
+    console.log('option', optionObj);
+
+    this.setState({
+      option: optionObj,
+    });
   }
 
   onChangeDate = (value, dateString) => {
@@ -152,11 +172,11 @@ class Transfer extends Component {
 
     const Password = (props) => {
       const suffix = <Icon type="close-circle" onClick={this.emitReveal} />;
-      return <div>
+      return <div style={{ marginTop: 6, marginBottom: 16 }}>
         <div style={{ marginBottom: 12 }}>
           <Input prefix={<Icon type="lock" suffix={suffix} style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
         </div>
-        <div style={{ marginBottom: 16 }}>
+        <div>
           <Input prefix={<Icon type="info" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Hint" />
         </div>
       </div>
@@ -179,10 +199,64 @@ class Transfer extends Component {
       </FormItem>
     }
 
+    const BasicSettings = (props) => {
+      return <Form layout={'vertical'}>
+        <FormItem label="Receiver(s):">
+          <Select
+            mode="tags"
+            style={{ width: '100%' }}
+            onChange={handleChange}
+            tokenSeparators={[',']}
+            placeholder="Be12 ID, Name or Email"
+            >
+            {children}
+          </Select>
+        </FormItem>
+        <FormItem label="Concepto:">
+          <Input size="large" placeholder="Descripción" defaultValue={this.state.transferName} />
+        </FormItem>
+        <FormItem label="Private message:">
+          <TextArea rows={4} placeholder="This message will be cihpered and is entirely private between you and the receiver(s)." />
+        </FormItem>
+      </Form>
+    }
+
+    const AdvancedSettings = (props) => {
+      return <Form layout={'vertical'}>
+        <p>{text}</p>
+        <div>
+          <Checkbox checked={this.state.option.password} value="password" onChange={this.onChange}>Protect with password</Checkbox>
+          { this.state.option.password && <Password/> }
+        </div>
+        <div>
+          <Checkbox checked={this.state.option.url} value="url" onChange={this.onChange}>Use URL link</Checkbox>
+          { this.state.option.url && <URL/> }
+        </div>
+        <div>
+          <Checkbox checked={this.state.option.members_visible} value="members_visible" onChange={this.onChange}>Allow to see with whom this resource is being shared</Checkbox>
+        </div>
+        <div>
+          <Checkbox checked={this.state.option.notification} value="notification" onChange={this.onChange}>Receive email on open</Checkbox>
+        </div>
+        <div>
+          <Checkbox checked={this.state.option.expiration} value="expiration" onChange={this.onChange}>Expiration date</Checkbox>
+          { this.state.option.expiration && <Expiration/> }
+        </div>
+      </Form>
+    }
+
+    const steps = [{
+      title: 'Basic',
+      content: <BasicSettings />,
+    }, {
+      title: 'Adv. settings',
+      content: <AdvancedSettings />,
+    }];
+
 
     return (
       <div>
-        <Button type="primary" onClick={this.showModal}>New transfer</Button>
+        <Button type="primary" onClick={this.showModal}>New transfer</Button><br/>
         <Button type="primary" onClick={this.showModal2}>Share on a file which already has been transfered previously</Button>
         <Modal
           title="New transfer"
@@ -191,55 +265,20 @@ class Transfer extends Component {
           onCancel={this.handleCancel}
           closable={false}
           footer={[
-            <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
+            <Button key="back" onClick={this.handleCancel}>
+              { this.state.current === 0 && 'Cancel'}
+              { this.state.current === 1 && 'Previous' }
+            </Button>,
             <Button key="submit" type="primary" loading={this.state.loading} onClick={this.handleOk}>
-              Send
+              { this.state.current === 0 && 'Next'}
+              { this.state.current === 1 && 'Send' }
             </Button>,
           ]}
           >
-          <div style={{ marginBottom: 18 }}>
-            <Input size="large" placeholder="Title" />
-          </div>
-          <Form layout={'vertical'}>
-            <FormItem label="Receiver(s):">
-              <Select
-                mode="tags"
-                style={{ width: '100%' }}
-                onChange={handleChange}
-                tokenSeparators={[',']}
-                placeholder="Be12 ID, Name or Email"
-                >
-                {children}
-              </Select>
-            </FormItem>
-            <FormItem label="Private message:">
-              <TextArea rows={4} placeholder="This message will be cihpered and is entirely private between you and the receiver(s)." />
-            </FormItem>
-          </Form>
-          <Collapse defaultActiveKey={['1']} onChange={callback}>
-            <Panel header="Advanced options" key="2">
-              <p>{text}</p>
-              
-              <div>
-                <Checkbox value="password" onChange={this.onChange}>Protect with password</Checkbox>
-                { this.state.option_password ? <Password/> : null }
-              </div>
-              <div>
-                <Checkbox value="url" onChange={this.onChange}>Use URL link</Checkbox>
-                { this.state.option_url ? <URL/> : null }
-              </div>
-              <div>
-                <Checkbox value="members_visible" onChange={this.onChange}>Allow to see with whom this resource is being shared</Checkbox>
-              </div>
-              <div>
-                <Checkbox value="notification" onChange={this.onChange}>Receive email on open</Checkbox>
-              </div>
-              <div>
-                <Checkbox value="expiration" onChange={this.onChange}>Expiration date</Checkbox>
-                { this.state.option_expiration ? <Expiration/> : null }
-              </div>
-            </Panel>
-          </Collapse>
+          <Steps current={this.state.current} size="small">
+            {steps.map(item => <Step key={item.title} title={item.title} />)}
+          </Steps>
+          <div className="steps-content" style={{marginTop: 16}}>{steps[this.state.current].content}</div>
         </Modal>
 
 
@@ -250,7 +289,7 @@ class Transfer extends Component {
 
 
         <Modal
-          title="Share file"
+          title="Manage sharing"
           width="75%"
           maxWidth="1100"
           visible={this.state.visible2}
@@ -262,7 +301,7 @@ class Transfer extends Component {
           <Layout>
             <Sider width={'55%'} style={{ background: '#fff', borderRight: '1px solid #d9d9d9' }}>
               <div className="share-description">
-                <h2>Filename_123432.ext</h2>
+                <h2>{this.state.transferName}</h2>
                 <ul>
                   <li>option1</li>
                   <li>option1</li>
@@ -271,31 +310,31 @@ class Transfer extends Component {
                 </ul>
               </div>
               <Collapse bordered={false} defaultActiveKey={['2']} onChange={callback}>
-                <Panel showArrow={false} header="Settings" key="1">
+                <Panel header="Settings" key="1">
                   <Form layout={'vertical'} onSubmit={this.handleSubmit}>
                     <FormItem
                       label="Title:"
                     >
-                      <Input placeholder="Title" value="Filename_123432.ext" />
+                      <Input placeholder="Title" defaultValue={this.state.transferName} onChange={this.onEditTitle}/>
                     </FormItem>
                   </Form>
                   <div>
                     <Checkbox value="password" onChange={this.onChange}>Protect with password</Checkbox>
-                    { this.state.option_password ? <Password/> : null }
+                    { this.state.option.password ? <Password/> : null }
                   </div>
                   <div>
                     <Checkbox value="url" onChange={this.onChange}>Use URL link</Checkbox>
-                    { this.state.option_url ? <URL/> : null }
+                    { this.state.option.url ? <URL/> : null }
                   </div>
                   <div>
                     <Checkbox value="notification" onChange={this.onChange}>Receive email on open</Checkbox>
                   </div>
                   <div>
                     <Checkbox value="expiration" onChange={this.onChange}>Expiration date</Checkbox>
-                    { this.state.option_expiration ? <Expiration/> : null }
+                    { this.state.option.expiration ? <Expiration/> : null }
                   </div>
                 </Panel>
-                <Panel showArrow={false} header="Sharing with" className="members-panel" key="2">
+                <Panel header="Sharing with" className="members-panel" key="2">
                   <List
                     className="demo-list"
                     itemLayout="horizontal"
@@ -307,12 +346,6 @@ class Transfer extends Component {
                           title={<a href="https://ant.design">{item.name.last}</a>}
                           description="International Relations - Be12 Company"
                         />
-                        <Row>
-                          <Checkbox value="notification" onChange={this.onChange}>Receive email on open</Checkbox>
-                        </Row>
-                        <Row>
-                          <TextArea rows={2} placeholder="This message will be cihpered and is entirely private between you and the receiver(s)." />
-                        </Row>
                       </List.Item>
                     )}
                   />

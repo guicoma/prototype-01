@@ -1,0 +1,41 @@
+.company-resources{
+    background-color: rgba(25, 143, 255, 0);
+    padding: 12px 12px 3px;
+    border: 1px dashed lightgray;
+    border-radius: 5px;
+    color: grey;
+}
+
+.company-resources > div {
+    margin-bottom: 10px;
+}
+
+.group-basic-form{
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.resource-warning{
+    padding: 12px;
+    background: #ff9900b3;
+    color: white;
+    border-radius: 5px;
+    grid-column: 1/3;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    column-gap: 10px;
+    margin-bottom: 12px;
+}
+
+.detail-text {
+    font-size: 12px;
+    opacity: 0.5;
+}
+
+.ant-progress-success-bg, .ant-progress-bg {
+    background-color: #52c41a;
+}
+.ant-progress-success-bg {
+    background-color: #1890ff;
+}
