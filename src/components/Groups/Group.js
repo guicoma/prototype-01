@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
 import Animate from 'rc-animate';
 import QueueAnim from 'rc-queue-anim';
-import { Modal, Button, Form, Input, InputNumber, Icon, Progress, AutoComplete, List, Avatar } from 'antd';
+import { Modal, Button, Form, Input, InputNumber, Icon, Progress, AutoComplete, List, Avatar, Tabs, Divider } from 'antd';
 
 import './Group.css';
 
 const FormItem = Form.Item;
+const TabPane = Tabs.TabPane;
+
+function callback(key) {
+  console.log(key);
+}
 
 const percentLimit = 20;
 const dataSource = ['Burns Bay Road', 'Downing Street', 'Wall Street'];
@@ -41,7 +46,8 @@ class Group extends Component {
       newStorage      : 3,
       newExternals    : 5,
       loading         : false,
-      visible         : false
+      visible         : false,
+      edit_modal_visible         : false
     };
   }
 
@@ -56,19 +62,18 @@ class Group extends Component {
     });
   }
 
-  handleSubmit = (e) => {
-    e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values);
-      }
+  showEditGroupModal = () => {
+    this.setState({
+      edit_modal_visible: true,
     });
   }
+
 
   handleCancel = (e) => {
     console.log(e);
     this.setState({
-      visible: false
+      visible: false,
+      edit_modal_visible: false,
     });
   }
 
@@ -127,9 +132,14 @@ class Group extends Component {
 
     const storagePercentageWarning = (percentLimit < storageAddedPercentage);
 
+    let group = {
+      name: "Group name1"
+    }
+
     return (
       <div>
         <Button type="primary" onClick={this.showModal}>New group</Button>
+        <Button type="primary" onClick={this.showEditGroupModal}>Edit group</Button>
 
 
         <Modal
@@ -153,79 +163,74 @@ class Group extends Component {
               { this.state.current === 0 && storagePercentageWarning && 'Submit petition'}
               { this.state.current === 1 && 'Done' }
             </Button>,
-          ]}
-          >
-          
-
+          ]}>
 
           <QueueAnim className="demo-content" type={['alpha', 'top']}>
             {this.state.current === 0 ? [<div key='a'>
               <Animate
             component=""
-            transitionName="fade"
-          >
+            transitionName="fade">
             {
               storagePercentageWarning ? 
               <div className="resource-warning">
                 <Icon type="warning" />You are requesting a large sized group, someone with group management permission will have to approve this petition.
               </div> : null}
-          </Animate>
-          <Form onSubmit={this.handleSubmit}>
-            <FormItem
-              validateStatus={groupNameError ? 'error' : ''}
-              help={groupNameError || ''}
-            >
-              {getFieldDecorator('groupName', {
-                rules: [{ required: true, message: 'Please input your group name!' }],
-              })(
-                <Input placeholder="Name" size="large"/>
-              )}
-            </FormItem>
-            <div className="group-basic-form">
-              <FormItem
-                {...formItemLayout}
-                validateStatus={groupStorageError ? 'error' : ''}
-                help={groupStorageError || ''}
-                label="Space:">
-                {getFieldDecorator('groupStorage', {
-                  rules: [{ required: true, message: 'Please input an amount!' }],
-                })(
-                  <InputNumber
-                    min={1}
-                    max={this.state.totalStorage}
-                    initialValue={this.state.newStorage}
-                    onChange={this.handleStorageChange}
-                  />
-                )}
-              </FormItem>
-              <FormItem
-                {...formItemLayout}
-                validateStatus={groupExternalError ? 'error' : ''}
-                help={groupExternalError || ''}
-                label="Externals:">
-                {getFieldDecorator('groupExternal', {
-                  rules: [{ required: true, message: 'Please input an amount!' }],
-                })(
-                  <InputNumber
-                    min={0}
-                    max={this.state.totalExternals}
-                    initialValue={this.state.newExternals}
-                    onChange={this.handleExternalChange}
-                  />
-                )}
-              </FormItem>
-            </div>
-          </Form>
-          <div className="company-resources">
-            <div>
-              <span>Company storage</span><span className="detail-text">(15GB of 50 left)</span>
-              <Progress percent={storageTotalPercentage} successPercent={storageTotalPercentage - storageAddedPercentage} size="small" />
-            </div>
-            <div>
-              <span>Invite links</span><span className="detail-text">(250 links of 500 left)</span>
-              <Progress percent={externalTotalPercentage} successPercent={externalTotalPercentage - externalAddedPercentage} size="small" />
-            </div>
-          </div>
+              </Animate>
+              <Form onSubmit={this.handleSubmit}>
+                <FormItem
+                  validateStatus={groupNameError ? 'error' : ''}
+                  help={groupNameError || ''}>
+                  {getFieldDecorator('groupName', {
+                    rules: [{ required: true, message: 'Please input your group name!' }],
+                  })(
+                    <Input placeholder="Name" size="large"/>
+                  )}
+                </FormItem>
+                <div className="group-basic-form">
+                  <FormItem
+                    {...formItemLayout}
+                    validateStatus={groupStorageError ? 'error' : ''}
+                    help={groupStorageError || ''}
+                    label="Space:">
+                    {getFieldDecorator('groupStorage', {
+                      rules: [{ required: true, message: 'Please input an amount!' }],
+                    })(
+                      <InputNumber
+                        min={1}
+                        max={this.state.totalStorage}
+                        initialValue={this.state.newStorage}
+                        onChange={this.handleStorageChange}
+                      />
+                    )}
+                  </FormItem>
+                  <FormItem
+                    {...formItemLayout}
+                    validateStatus={groupExternalError ? 'error' : ''}
+                    help={groupExternalError || ''}
+                    label="Externals:">
+                    {getFieldDecorator('groupExternal', {
+                      rules: [{ required: true, message: 'Please input an amount!' }],
+                    })(
+                      <InputNumber
+                        min={0}
+                        max={this.state.totalExternals}
+                        initialValue={this.state.newExternals}
+                        onChange={this.handleExternalChange}
+                      />
+                    )}
+                  </FormItem>
+                </div>
+              </Form>
+              <div className="company-resources">
+                <div>
+                  <span>Company storage</span><span className="detail-text">(15GB of 50 left)</span>
+                  <Progress percent={storageTotalPercentage} successPercent={storageTotalPercentage - storageAddedPercentage} size="small" />
+                </div>
+                <div>
+                  <span>Invite links</span><span className="detail-text">(250 links of 500 left)</span>
+                  <Progress percent={externalTotalPercentage} successPercent={externalTotalPercentage - externalAddedPercentage} size="small" />
+                </div>
+              </div>
               
             </div>] : [<div key="c">
             <Icon type="smile-o" style={{ fontSize: 26, color: '#08c' }} />
@@ -253,6 +258,77 @@ class Group extends Component {
               </div>
             </div>]}
           </QueueAnim>
+        </Modal>
+
+
+        <Modal
+          title="Basic Modal"
+          visible={this.state.edit_modal_visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}>
+          <Tabs defaultActiveKey="1" onChange={callback}>
+            <TabPane tab="Overview" key="1">
+            <Form layout={'vertical'}>
+              <FormItem label="Name">
+                <Input placeholder="input placeholder" size="large" value="{group.name}" />
+              </FormItem>
+              <Divider orientation="left">Group resources</Divider>
+              <div className="group-basic-form">
+                  <FormItem
+                    {...formItemLayout}
+                    validateStatus={groupStorageError ? 'error' : ''}
+                    help={groupStorageError || ''}
+                    label="Space:">
+                    {getFieldDecorator('groupStorage', {
+                      rules: [{ required: true, message: 'Please input an amount!' }],
+                    })(
+                      <InputNumber
+                        min={1}
+                        max={this.state.totalStorage}
+                        initialValue={this.state.newStorage}
+                        onChange={this.handleStorageChange}
+                      />
+                    )}
+                  </FormItem>
+                  <FormItem
+                    {...formItemLayout}
+                    validateStatus={groupExternalError ? 'error' : ''}
+                    help={groupExternalError || ''}
+                    label="Externals:">
+                    {getFieldDecorator('groupExternal', {
+                      rules: [{ required: true, message: 'Please input an amount!' }],
+                    })(
+                      <InputNumber
+                        min={0}
+                        max={this.state.totalExternals}
+                        initialValue={this.state.newExternals}
+                        onChange={this.handleExternalChange}
+                      />
+                    )}
+                  </FormItem>
+                  <div className="stacked-bar-graph">
+                    <span style={{width:'20%'}} className="bar-1">20%</span>
+                    <span style={{width:'15%'}} className="bar-2">15%</span>
+                    <span style={{width:'30%'}} className="bar-3">30%</span>
+                  </div>
+                  <Button type="primary" shape="circle" icon="edit" />
+                </div>
+              </Form>
+              <div className="company-resources">
+                <div>
+                  <span>Company storage</span><span className="detail-text">(15GB of 50 left)</span>
+                  <Progress percent={storageTotalPercentage} successPercent={storageTotalPercentage - storageAddedPercentage} size="small" />
+                </div>
+                <div>
+                  <span>Invite links</span><span className="detail-text">(250 links of 500 left)</span>
+                  <Progress percent={externalTotalPercentage} successPercent={externalTotalPercentage - externalAddedPercentage} size="small" />
+                </div>
+              </div>
+            </TabPane>
+            <TabPane tab="Applications" key="2">Content of Tab Pane 1</TabPane>
+            <TabPane tab="Members" key="3">Content of Tab Pane 2</TabPane>
+            <TabPane tab="Rules" key="4">Content of Tab Pane 3</TabPane>
+          </Tabs>
         </Modal>
 
       </div>
