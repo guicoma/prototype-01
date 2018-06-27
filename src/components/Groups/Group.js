@@ -1,12 +1,22 @@
 import React, { Component } from 'react';
 import Animate from 'rc-animate';
 import QueueAnim from 'rc-queue-anim';
-import { Modal, Button, Form, Input, InputNumber, Icon, Progress, AutoComplete, List, Avatar, Tabs, Divider } from 'antd';
+import { Modal, Button, Form, Input, InputNumber, Icon, Progress, AutoComplete, List, Avatar, Tabs, Divider, Select, Row } from 'antd';
 
 import './Group.css';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
+const Option = Select.Option;
+
+const children = [];
+for (let i = 10; i < 36; i++) {
+  children.push(<Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>);
+}
+
+function handleChange(value) {
+  console.log(`selected ${value}`);
+}
 
 function callback(key) {
   console.log(key);
@@ -270,10 +280,12 @@ class Group extends Component {
             <TabPane tab="Overview" key="1">
             <Form layout={'vertical'}>
               <FormItem label="Name">
-                <Input placeholder="input placeholder" size="large" value="{group.name}" />
+                <Input placeholder="input placeholder" size="large" initialValue={group.name} />
               </FormItem>
               <Divider orientation="left">Group resources</Divider>
-              <div className="group-basic-form">
+              
+                <Row>
+                  <Progress type="dashboard" percent={30} width={80} />
                   <FormItem
                     {...formItemLayout}
                     validateStatus={groupStorageError ? 'error' : ''}
@@ -290,6 +302,9 @@ class Group extends Component {
                       />
                     )}
                   </FormItem>
+                </Row>
+                <Row>
+                  <Progress type="dashboard" percent={1} width={80} />
                   <FormItem
                     {...formItemLayout}
                     validateStatus={groupExternalError ? 'error' : ''}
@@ -306,13 +321,13 @@ class Group extends Component {
                       />
                     )}
                   </FormItem>
+                </Row>
                   <div className="stacked-bar-graph">
                     <span style={{width:'20%'}} className="bar-1">20%</span>
                     <span style={{width:'15%'}} className="bar-2">15%</span>
                     <span style={{width:'30%'}} className="bar-3">30%</span>
                   </div>
                   <Button type="primary" shape="circle" icon="edit" />
-                </div>
               </Form>
               <div className="company-resources">
                 <div>
@@ -327,7 +342,30 @@ class Group extends Component {
             </TabPane>
             <TabPane tab="Applications" key="2">Content of Tab Pane 1</TabPane>
             <TabPane tab="Members" key="3">Content of Tab Pane 2</TabPane>
-            <TabPane tab="Rules" key="4">Content of Tab Pane 3</TabPane>
+            <TabPane tab="Rules" key="4">
+              <Button type="primary" onClick={this.addRule}>Add Rule</Button>
+              <Row type="flex" justify="space-around" align="middle">
+                Add
+                <Select
+                  mode="multiple"
+                  style={{ width: 250 }}
+                  placeholder="Please select"
+                  defaultValue={['a10', 'c12']}
+                  onChange={handleChange}
+                >
+                  {children}
+                </Select>
+                from
+                <Select defaultValue="0" style={{ width: 120 }} onChange={handleChange}>
+                  <Option value="0">Anywhere</Option>
+                  <Option value="1">Headquarters</Option>
+                  <Option value="2">Plaza España</Option>
+                  <Option value="3">Torre Mapre</Option>
+                </Select>
+                Delete
+              </Row>
+
+            </TabPane>
           </Tabs>
         </Modal>
 
