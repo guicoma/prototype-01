@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Animate from 'rc-animate';
 import QueueAnim from 'rc-queue-anim';
-import { Modal, Button, Form, Input, InputNumber, Icon, Progress, AutoComplete, List, Avatar, Tabs, Divider, Select, Row } from 'antd';
+import { Modal, Button, Form, Input, InputNumber, Icon, Progress, AutoComplete, List, Avatar, Tabs, Divider, Select, Row, Col } from 'antd';
 
 import './Group.css';
 
@@ -142,6 +142,14 @@ class Group extends Component {
 
     const storagePercentageWarning = (percentLimit < storageAddedPercentage);
 
+    const selectAfter = (
+      <Select defaultValue="Read" style={{ width: 80 }}>
+        <Option value="Read">Read</Option>
+        <Option value="Write">Write</Option>
+        <Option value="Moderator">Moderator</Option>
+      </Select>
+    );
+
     let group = {
       name: "Group name1"
     }
@@ -275,60 +283,68 @@ class Group extends Component {
           title="Basic Modal"
           visible={this.state.edit_modal_visible}
           onOk={this.handleOk}
-          onCancel={this.handleCancel}>
+          onCancel={this.handleCancel}
+          width={740}>
           <Tabs defaultActiveKey="1" onChange={callback}>
             <TabPane tab="Overview" key="1">
-            <Form layout={'vertical'}>
-              <FormItem label="Name">
-                <Input placeholder="input placeholder" size="large" initialValue={group.name} />
-              </FormItem>
-              <Divider orientation="left">Group resources</Divider>
-              
-                <Row>
-                  <Progress type="dashboard" percent={30} width={80} />
-                  <FormItem
-                    {...formItemLayout}
-                    validateStatus={groupStorageError ? 'error' : ''}
-                    help={groupStorageError || ''}
-                    label="Space:">
-                    {getFieldDecorator('groupStorage', {
-                      rules: [{ required: true, message: 'Please input an amount!' }],
-                    })(
-                      <InputNumber
-                        min={1}
-                        max={this.state.totalStorage}
-                        initialValue={this.state.newStorage}
-                        onChange={this.handleStorageChange}
-                      />
-                    )}
-                  </FormItem>
-                </Row>
-                <Row>
-                  <Progress type="dashboard" percent={1} width={80} />
-                  <FormItem
-                    {...formItemLayout}
-                    validateStatus={groupExternalError ? 'error' : ''}
-                    help={groupExternalError || ''}
-                    label="Externals:">
-                    {getFieldDecorator('groupExternal', {
-                      rules: [{ required: true, message: 'Please input an amount!' }],
-                    })(
-                      <InputNumber
-                        min={0}
-                        max={this.state.totalExternals}
-                        initialValue={this.state.newExternals}
-                        onChange={this.handleExternalChange}
-                      />
-                    )}
-                  </FormItem>
-                </Row>
-                  <div className="stacked-bar-graph">
-                    <span style={{width:'20%'}} className="bar-1">20%</span>
-                    <span style={{width:'15%'}} className="bar-2">15%</span>
-                    <span style={{width:'30%'}} className="bar-3">30%</span>
-                  </div>
-                  <Button type="primary" shape="circle" icon="edit" />
+              <Form layout={'vertical'}>
+                <FormItem label="Name">
+                  <Input placeholder="input placeholder" size="large" initialValue={group.name} />
+                </FormItem>
               </Form>
+              <Divider orientation="left">Group resources</Divider>
+              <Row type="flex" justify-content="space-around" align="middle">
+                <Col span="4">
+                  <Progress type="dashboard" percent={30} width={80} />
+                </Col>
+                <Col span="8">
+                  <Row type="flex" align="middle">
+                    <Form layout="inline">
+                      <FormItem
+                        validateStatus={groupStorageError ? 'error' : ''}
+                        help={groupStorageError || ''}>
+                          <InputNumber
+                            min={1}
+                            max={this.state.totalStorage}
+                            initialValue={this.state.newStorage}
+                            onChange={this.handleStorageChange}
+                          />
+                      </FormItem>
+                    </Form>
+                    <label>GB</label>
+                  </Row>
+                </Col>
+                <Col span="4">
+                  <Progress type="dashboard" percent={1} width={80} />
+                </Col>
+                <Col span="8">
+                  <Row type="flex" align="middle">
+                    <Form layout="inline">
+                      <FormItem
+                        validateStatus={groupExternalError ? 'error' : ''}
+                        help={groupExternalError || ''}>
+                          <InputNumber
+                            min={0}
+                            max={this.state.totalExternals}
+                            initialValue={this.state.newExternals}
+                            onChange={this.handleExternalChange}
+                          />
+                      </FormItem>
+                    </Form>
+                    <label>
+                      Links
+                    </label>
+                  </Row>
+                </Col>
+              </Row>
+              <Row type="flex" justify-content="space-around" align="middle">
+                <Col span="4">
+                  12Gb available
+                </Col>
+                <Col span="4" offset={8}>
+                  98 Links available
+                </Col>
+                </Row>
               <div className="company-resources">
                 <div>
                   <span>Company storage</span><span className="detail-text">(15GB of 50 left)</span>
@@ -341,7 +357,11 @@ class Group extends Component {
               </div>
             </TabPane>
             <TabPane tab="Applications" key="2">Content of Tab Pane 1</TabPane>
-            <TabPane tab="Members" key="3">Content of Tab Pane 2</TabPane>
+            <TabPane tab="Members" key="3">Content of Tab Pane 2
+            <div style={{ marginBottom: 16 }}>
+              <Input addonAfter={selectAfter} defaultValue="mysite" />
+            </div>
+            </TabPane>
             <TabPane tab="Rules" key="4">
               <Button type="primary" onClick={this.addRule}>Add Rule</Button>
               <Row type="flex" justify="space-around" align="middle">
