@@ -185,15 +185,6 @@ class Group extends Component {
 
           <QueueAnim className="demo-content" type={['alpha', 'top']}>
             {this.state.current === 0 ? [<div key='a'>
-              <Animate
-            component=""
-            transitionName="fade">
-            {
-              storagePercentageWarning ? 
-              <div className="resource-warning">
-                <Icon type="warning" />You are requesting a large sized group, someone with group management permission will have to approve this petition.
-              </div> : null}
-              </Animate>
               <Form onSubmit={this.handleSubmit}>
                 <FormItem
                   validateStatus={groupNameError ? 'error' : ''}
@@ -239,6 +230,15 @@ class Group extends Component {
                   </FormItem>
                 </div>
               </Form>
+              <Animate
+                component=""
+                transitionName="fade">
+              {
+              storagePercentageWarning ? 
+              <div className="resource-warning">
+                <Icon type="warning" />You are requesting a large sized group, someone with group management permission will have to approve this petition.
+              </div> : null}
+              </Animate>
               <div className="company-resources">
                 <div>
                   <span>Company storage</span><span className="detail-text">(15GB of 50 left)</span>
